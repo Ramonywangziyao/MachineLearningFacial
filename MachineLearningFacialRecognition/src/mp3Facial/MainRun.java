@@ -1,13 +1,18 @@
 package mp3Facial;
 
+import java.awt.Color;
 import java.awt.List;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
 
 public class MainRun{
 	Queue<GraphicImage> tested;
@@ -36,8 +41,62 @@ public class MainRun{
 		labelLists.add(label);
 	}
 		
-		
-	//read Images	
+	
+	//read Images
+	int totalImageSample = 5000;
+	Queue<GraphicImage> imageList = new LinkedList<GraphicImage>();
+	String line;
+	int numCount = 70;
+	int faceCount = 0;
+	int numSize = 60;
+	int faceSize = 0;
+	GraphicImage newImage = new GraphicImage();
+	for(int name = 0;name<totalImageSample;name++)
+	{
+		String fileName = name+".jpg";
+		BufferedImage originalImage = null;
+		try {
+			originalImage = ImageIO.read(new File(fileName));
+		    BufferedImage img = originalImage.getSubimage(x, y, width, height);
+		} catch (IOException e) {
+		}
+        if (newImage.pixelImage == null) 
+        {
+            newImage.setPixelImage(new Pixel[numCount][numSize]);
+        }
+        for (int col = 0; col < numSize; col++) 
+        {
+        	for(int row = 0; row<numCount;row++)
+        	{
+        		Color mycolor = new Color(img.getRGB(row, col));
+        		newImage.pixelImage[row][col].setRed(mycolor.getRed());
+        		newImage.pixelImage[row][col].setGreen(mycolor.getGreen());
+        		newImage.pixelImage[row][col].setBlue(mycolor.getBlue());
+        		
+        		newImage.pixelImage[row][col] = new Pixel();
+        		newImage.pixelImage[row][col].setFeature(Integer.parseInt(mycolor.getRed()+mycolor.getGreen()+mycolor.getBlue()+""));
+        		newImage.pixelImage[row][col].setI(row);
+        		newImage.pixelImage[row][col].setJ(col);
+        		labelCounts[labelLists.peek()].pixelLocation[row][col].rgbMap[mycolor.getRed()][mycolor.getGreen()][mycolor.getBlue()] += 1;
+        	
+            
+        		System.out.print(newImage.pixelImage[row][col].getFeature());
+
+        	}
+        }
+		labelCounts[labelLists.peek()].totalInSample+=1;
+		newImage.setLabel(labelLists.poll());
+	
+		imageList.add(newImage);
+		newImage = new GraphicImage();
+		newImage.setPixelImage(new Pixel[numCount][numSize]);
+	}
+	
+	
+	
+	
+	
+	/*
 	String fileName = "src/facedatatrain.txt";
 	Queue<GraphicImage> imageList = new LinkedList<GraphicImage>();
 	String line;
@@ -94,15 +153,16 @@ public class MainRun{
         
         System.out.println();			
 	}
+	*/
 	Train newTrain = new Train();
 	newTrain.trainData(labelCounts);
 	System.out.println("Training complete!  Ready to take the test!");
-	
+	/*
 	Test newTest = new Test();
 	tested = newTest.testImages(labelCounts);
 	
 	ev = new Evaluation(tested,labelCounts);
-	
+	*/
 	
 	}
 }
