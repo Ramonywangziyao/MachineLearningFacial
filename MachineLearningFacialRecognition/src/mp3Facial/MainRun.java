@@ -1,6 +1,7 @@
 package mp3Facial;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.List;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -29,7 +31,7 @@ public class MainRun{
 	a.length();
 
 	//read Labels	
-
+/*
 	String labelFile = "src/facedatatrainlabels.txt";
 	String labelline;
 	Queue<Integer> labelLists = new LinkedList<Integer>();
@@ -40,7 +42,7 @@ public class MainRun{
 		int label = Integer.parseInt(labelline);
 		labelLists.add(label);
 	}
-		
+	*/	
 	
 	//read Images
 	int totalImageSample = 5000;
@@ -50,16 +52,18 @@ public class MainRun{
 	int faceCount = 0;
 	int numSize = 60;
 	int faceSize = 0;
+	
 	GraphicImage newImage = new GraphicImage();
-	for(int name = 0;name<totalImageSample;name++)
+	String urlFile = "src/faceurl.txt";
+	FileReader urlReader = new FileReader(urlFile);
+	BufferedReader urlBuffer = new BufferedReader(urlReader);
+	String urlline;
+	while((urlline = urlBuffer.readLine())!=null)
 	{
-		String fileName = name+".jpg";
-		BufferedImage originalImage = null;
-		try {
-			originalImage = ImageIO.read(new File(fileName));
-		    BufferedImage img = originalImage.getSubimage(x, y, width, height);
-		} catch (IOException e) {
-		}
+		URL url = new URL(urlline);
+		Image img = ImageIO.read(url);  
+		
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         if (newImage.pixelImage == null) 
         {
             newImage.setPixelImage(new Pixel[numCount][numSize]);
@@ -68,7 +72,7 @@ public class MainRun{
         {
         	for(int row = 0; row<numCount;row++)
         	{
-        		Color mycolor = new Color(img.getRGB(row, col));
+        		Color mycolor = new Color(bimage.getRGB(row, col));
         		newImage.pixelImage[row][col].setRed(mycolor.getRed());
         		newImage.pixelImage[row][col].setGreen(mycolor.getGreen());
         		newImage.pixelImage[row][col].setBlue(mycolor.getBlue());
@@ -77,15 +81,15 @@ public class MainRun{
         		newImage.pixelImage[row][col].setFeature(Integer.parseInt(mycolor.getRed()+mycolor.getGreen()+mycolor.getBlue()+""));
         		newImage.pixelImage[row][col].setI(row);
         		newImage.pixelImage[row][col].setJ(col);
-        		labelCounts[labelLists.peek()].pixelLocation[row][col].rgbMap[mycolor.getRed()][mycolor.getGreen()][mycolor.getBlue()] += 1;
+        		labelCounts[1].pixelLocation[row][col].rgbMap[mycolor.getRed()][mycolor.getGreen()][mycolor.getBlue()] += 1;
         	
             
         		System.out.print(newImage.pixelImage[row][col].getFeature());
 
         	}
         }
-		labelCounts[labelLists.peek()].totalInSample+=1;
-		newImage.setLabel(labelLists.poll());
+		labelCounts[1].totalInSample+=1;
+		newImage.setLabel(1);
 	
 		imageList.add(newImage);
 		newImage = new GraphicImage();
